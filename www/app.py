@@ -1,7 +1,17 @@
+# -*- coding:utf-8 -*-
+
+__author__='Zack'
+
+'''
+async web application.
+'''
+
 import logging; logging.basicConfig(level=logging.INFO)
 import asyncio,os,json,time
 from datetime import datetime
 from aiohttp import web
+
+from orm import Model,StringField,IntegerField
 
 def index(request):
 	return web.Response(body='<h1>Awesome</h1>',headers={'Content-Type':'text/html'})
