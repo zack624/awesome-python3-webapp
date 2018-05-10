@@ -1,32 +1,16 @@
-from orm import Model,StringField,IntegerField,create_pool
+from models import User,Blog,Comment
+import orm
 import asyncio
 
 
-class User(Model):
-    __table__ = 'users'
-    id = IntegerField(primary_key=True)
-    name = StringField()
+loop = asyncio.get_event_loop()
 
 
 @asyncio.coroutine
-def main(loop):
-    yield from create_pool(loop, **database)
-    user = User()
-    user.id = 123
-    user.name = 'Test'
+def test():
+    yield from orm.create_pool(loop,user='root',password='1234',db='awesome')
+    user = User(name='Test',email='test@zack.com',passwd='1234',image='about:blank')
     yield from user.save()
-    return user.name
 
 
-loop = asyncio.get_event_loop()
-database = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '1234',
-    'db': 'python_test'
-}
-
-task = asyncio.ensure_future(main(loop))
-
-res = loop.run_until_complete(task)
-print(res)
+loop.run_until_complete(test())
