@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+﻿# -*- coding:utf-8 -*-
 
 __author__='Zack'
 
@@ -22,7 +22,7 @@ def init_jinja2(app,**kw):
 	logging.info('init jinja2...')
 	options = dict(
 		autoescape = kw.get('autoescape',True),
-		block_start_string = kw.get('block_start_string','{%'),
+		block_start_string = kw.get('block_start_string','{%'),  # 对应控制html中的block和变量名
 		block_end_string = kw.get('block_end_string','%}'),
 		variable_start_string = kw.get('variable_start_string','{{'),
 		variable_end_string = kw.get('variable_end_string','}}'),
@@ -39,6 +39,8 @@ def init_jinja2(app,**kw):
 			env.filters[name] = f
 	app['__templating__'] = env
 
+
+# middlewares,当client访问一个url时，在handler周围执行
 @asyncio.coroutine
 def logger_factory(app,handler):
 	@asyncio.coroutine
@@ -48,7 +50,7 @@ def logger_factory(app,handler):
 	return logger
 
 @asyncio.coroutine
-def response_factory(app,handler):
+def response_factory(app,handler):  # middlewares,handlers里的handler执行完毕后，再封装成web.router.add_router()需要的StreamResponse
 	@asyncio.coroutine
 	def response(request):
 		logging.info('Response handler...')
@@ -67,11 +69,11 @@ def response_factory(app,handler):
 			return resp
 		if isinstance(r,dict):
 			template = r.get('__template__')
-			if template is None:
+			if template is None:  # 直接处理json数据
 				resp = web.Response(body=json.dumps(r,ensure_ascii=False,default=lambda o:o.__dict__).encode('utf-8'))
 				resp.content_type = 'application/json;charset=utf-8'
 				return resp
-			else:
+			else:  # 转发到handler中__template__对应的模板
 				resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
 				resp.content_type = 'text/html;charset=utf-8'
 				return resp

@@ -1,3 +1,6 @@
+# -*- coding:utf-8 -*-
+
+
 import asyncio, os, inspect, logging, functools
 
 from urllib import parse
@@ -32,7 +35,7 @@ def post(path):
     return decorator
 
 
-def get_required_kw_args(fn):
+def get_required_kw_args(fn):  # 取出handlers里的一个方法的形参中命名关键字参数(*,a,b=1)中无默认值的元组(a,)
     args = []
     params = inspect.signature(fn).parameters
     for name, param in params.items():
@@ -41,7 +44,7 @@ def get_required_kw_args(fn):
     return tuple(args)
 
 
-def get_named_kw_args(fn):
+def get_named_kw_args(fn):  # 取出handlers里的一个方法的形参中命名关键字参数(*,a,b)元组(a,b)
     args = []
     params = inspect.signature(fn).parameters
     for name, param in params.items():
@@ -50,19 +53,19 @@ def get_named_kw_args(fn):
     return tuple(args)
 
 
-def has_named_kw_args(fn):
+def has_named_kw_args(fn):  # 检测handlers里的一个方法的形参中有没有命名关键字参数(*,a,b)
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
             return True
 
-def has_var_kw_arg(fn):
+def has_var_kw_arg(fn):  # 检测handlers里的一个方法的形参中有没有可变关键字参数(**kw)
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.VAR_KEYWORD:
             return True
 
-def has_request_arg(fn):
+def has_request_arg(fn):  # 检测handlers里的方法的形参中有没有(request)
     sig = inspect.signature(fn)
     params = sig.parameters
     found = False
@@ -86,7 +89,7 @@ class RequestHandler(object):
         self._required_kw_args = get_required_kw_args(fn)
 
     @asyncio.coroutine
-    def __call__(self, request):
+    def __call__(self, request):  # 直接将实例作为函数使用时，即调用了__call__方法
         kw = None
         if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args:
         	if request.method == 'POST':
@@ -152,7 +155,7 @@ def add_route(app,fn):
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
     logging.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
-    app.router.add_route(method, path, RequestHandler(app, fn))
+    app.router.add_route(method, path, RequestHandler(app, fn))  # RequestHandler(app,fn)是一个实例，且是coroutine
 
 def add_routes(app, module_name):
     n = module_name.rfind('.')
