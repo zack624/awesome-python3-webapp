@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 configs = {
     'debug': True,
     'db': {

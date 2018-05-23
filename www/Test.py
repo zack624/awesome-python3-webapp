@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from models import User,Blog,Comment
 import orm
 import asyncio
