@@ -1,2 +1,1 @@
-Git is a version control system.
-Git is free software.
+The web project's url is <http://www.zackblog.ml/>
